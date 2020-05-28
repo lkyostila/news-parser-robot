@@ -7,4 +7,4 @@ ${newsdir}
 *** Test Cases ***
 OPEN ALL NEWS
     get news
-    open browser    File:///${CURDIR}\\..\\uutiset.html  Chrome
+    open browser    File:///${CURDIR}\\..\\news.html  Chrome
