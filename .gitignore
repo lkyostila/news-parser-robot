@@ -5,3 +5,6 @@ log.html
 venv/
 .idea/
 *.pyc
+*.png
+*.jpg
+*.log
