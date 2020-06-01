@@ -50,10 +50,15 @@ def parse_news_by_keywords(file,newssite_name,url):
         time = news_entry.published[:22]
         if len(keywords) > 0:
             for keyword in keywords:
-                if(keyword in news_entry.title and news_entry.title not in used_news_headlines):
+                a = len(keyword)
+                b = a - a * 0.2
+                b = int(b)
+                short_keyword = keyword[0:b]
+                if(short_keyword in news_entry.title and news_entry.title not in used_news_headlines):
                     used_news_headlines.append(news_entry.title)
                     file.write('<a href="%s" ><p>(%s) | %s</p></a>\n\n'
                                % (news_entry.link,time,news_entry.title))
         else:
             file.write('<a href="%s" ><p>(%s) | %s</p></a>\n\n'
                        % (news_entry.link, time, news_entry.title))
+   
