@@ -15,9 +15,5 @@ OPEN ALL NEWS
     Get Window Titles
     Select Window    title=undefined
     go to   https://translate.google.fi/?hl=fi#view=home&op=translate&sl=auto&tl=fi&text=${headlines}
-    #click element   css:body > a:nth-child(4)
-    #select window   title=Google Kääntäjä
-    #input text  id:source   ${headlines}
-    #sleep   3
     click element   css:.res-tts
     select window   title=arvinews
