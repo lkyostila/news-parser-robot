@@ -1,4 +1,5 @@
 import feedparser
+import textwrap
 
 def define_keywords():
     x = input()
@@ -15,7 +16,11 @@ used_news_headlines = []
 
 def get_news():
     file = open("news.html","w", encoding="utf-8")
-    file.write('<meta charset="UTF-8">\n')
+    file.write('<html>'
+               '<head>'
+               '<meta charset="UTF-8">\n'
+               '<title>arvinews</title>\n'
+               '</head>')
     file.write('<style>'
                'body {background-color: black; font-family: monospace; color: yellow;}'
                'h2 {color: #03fc30;}'
@@ -24,7 +29,8 @@ def get_news():
                'table {border-collapse: collapse}'
                'th,td,table {border: 1px solid cyan}'
                '</style>')
-    file.write('<h2>Viimeisimmät uutiset\n\n</h2>')
+    file.write('<body>\n'
+               '<h2>Viimeisimmät uutiset\n\n</h2>')
     if len(keywords) > 0:
         file.write('<h3>Avainsanoilla: ')
         kwstring = ""
@@ -40,20 +46,55 @@ def get_news():
     for entry in url_dict:
         parse_news_by_keywords(file,entry,url_dict[entry])
     file.write('\n'
-               '<iframe id="hissimusiikki" width="491" height="368" src="https://www.youtube.com/embed/VBlFHuCzPgY?autoplay=1" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>')
+               '<div id="player"></div>\n')
+    file.write("<script>"
+                  "var tag = document.createElement('script');"
+                  "tag.src = \"https://www.youtube.com/iframe_api\";"
+                  "var firstScriptTag = document.getElementsByTagName('script')[0];"
+                  "firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);"
+                  "var player;"
+                  "function onYouTubeIframeAPIReady() {"
+                    "player = new YT.Player('player', {"
+                        "height: '390',"
+                        "width: '640',"
+                        "videoId: 'VBlFHuCzPgY',"
+                    "events: {"
+                        "'onReady': onPlayerReady,"
+                    "}"
+                    "});"
+                  "}"
+                  "function onPlayerReady(event) {"
+                    "event.target.playVideo();"
+                    "player.setVolume(20);"
+                  "}"
+                "</script>"
+               "</body>"
+               "</html>")
     file.close()
+    headlines = "Hei. Minä olen Arvi Lind ja tervetuloa päivän uutisiin. Tässä uutiset aiheista "
+    for keyword in keywords:
+        headlines += keyword + ", "
+    headlines += ". "
+    for headline in used_news_headlines:
+        headlines += headline + ". "
+    textwrap.shorten(headlines,width=5000)
+    return headlines
 
 def parse_news_by_keywords(file,newssite_name,url):
     parsed_data = feedparser.parse(url)
     file.write("<h2>%s</h2>\n\n\n" % newssite_name.upper())
-    for news_entry in parsed_data.entries:
-        time = news_entry.published[:22]
-        if len(keywords) > 0:
+    if len(keywords) > 0:
+        for news_entry in parsed_data.entries:
+            time = news_entry.published[:22]
             for keyword in keywords:
                 if(keyword in news_entry.title and news_entry.title not in used_news_headlines):
                     used_news_headlines.append(news_entry.title)
-                    file.write('<a href="%s" ><p>(%s) | %s</p></a>\n\n'
-                               % (news_entry.link,time,news_entry.title))
-        else:
-            file.write('<a href="%s" ><p>(%s) | %s</p></a>\n\n'
+                    file.write('<a href="%s" target="_blank" ><p>(%s) | %s</p></a>\n\n'
+                             % (news_entry.link,time,news_entry.title))
+    else:
+        for i in range (0,6):
+            news_entry = parsed_data.entries[i]
+            time = news_entry.published[:22]
+            used_news_headlines.append(news_entry.title)
+            file.write('<a href="%s" target="_blank" ><p>(%s) | %s</p></a>\n\n'
                        % (news_entry.link, time, news_entry.title))
