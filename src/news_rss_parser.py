@@ -7,8 +7,8 @@ def define_keywords():
     return splitted
 
 keywords = define_keywords()
-url_dict = {"yle": "https://feeds.yle.fi/uutiset/v1/majorHeadlines/YLE_UUTISET.rss",
-            "kauppalehti": "https://feeds.kauppalehti.fi/rss/main",
+url_dict = {"Yle": "https://feeds.yle.fi/uutiset/v1/majorHeadlines/YLE_UUTISET.rss",
+            "Kauppalehti": "https://feeds.kauppalehti.fi/rss/main",
             "Helsingin Sanomat": "https://www.hs.fi/rss/tuoreimmat.xml",
             "Iltasanomat": "https://www.is.fi/rss/tuoreimmat.xml",
             "Iltalehti": "https://www.iltalehti.fi/rss/uutiset.xml"}
@@ -71,14 +71,24 @@ def get_news():
                "</body>"
                "</html>")
     file.close()
-    headlines = "Hei. Minä olen Arvi Lind ja tervetuloa päivän uutisiin. Tässä uutiset aiheista "
-    for keyword in keywords:
-        headlines += keyword + ", "
-    headlines += ". "
-    for headline in used_news_headlines:
-        headlines += headline + ". "
-    textwrap.shorten(headlines,width=5000)
-    return headlines
+    if len(keywords) > 0:
+        headlines = "Hei. Minä olen Arvi Lind ja tervetuloa päivän uutisiin. Tässä uutiset aiheista "
+        for keyword in keywords:
+            headlines += keyword + ", "
+        headlines += ". "
+        for headline in used_news_headlines:
+            headlines += headline + ". "
+        textwrap.shorten(headlines,width=5000)
+        return headlines
+    else:
+        headlines = "Hei. Minä olen Arvi Lind ja tervetuloa päivän uutisiin. Tässä tuoreimmat uutiset. "
+        for keyword in keywords:
+            headlines += keyword + ", "
+        headlines += ". "
+        for headline in used_news_headlines:
+            headlines += headline + ". "
+        textwrap.shorten(headlines,width=5000)
+        return headlines
 
 def parse_news_by_keywords(file,newssite_name,url):
     parsed_data = feedparser.parse(url)
@@ -87,14 +97,12 @@ def parse_news_by_keywords(file,newssite_name,url):
         for news_entry in parsed_data.entries:
             time = news_entry.published[:22]
             for keyword in keywords:
-                a = len(keyword)
-                b = a - a * 0.2
-                b = int(b)
-                short_keyword = keyword[0:b]
-                if(short_keyword in news_entry.title and news_entry.title not in used_news_headlines):
+                if(keyword in news_entry.title and news_entry.title not in used_news_headlines):
+                    file.write('<a href="%s" target="_blank" ><p>(%s) | %s</p></a>\n\n'
+                               % (news_entry.link, time, news_entry.title))
                     used_news_headlines.append(news_entry.title)
     else:
-        for i in range (0,6):
+        for i in range (0,10):
             news_entry = parsed_data.entries[i]
             time = news_entry.published[:22]
             used_news_headlines.append(news_entry.title)
