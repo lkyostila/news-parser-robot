@@ -97,12 +97,17 @@ def parse_news_by_keywords(file,newssite_name,url):
         for news_entry in parsed_data.entries:
             time = news_entry.published[:22]
             for keyword in keywords:
+                if len(keyword) > 6:
+                    a = len(keyword)
+                    b = a - a * 0.1
+                    b = int(b)
+                    keyword = keyword[0:b]
                 if(keyword in news_entry.title and news_entry.title not in used_news_headlines):
                     file.write('<a href="%s" target="_blank" ><p>(%s) | %s</p></a>\n\n'
                                % (news_entry.link, time, news_entry.title))
                     used_news_headlines.append(news_entry.title)
     else:
-        for i in range (0,10):
+        for i in range (0,8):
             news_entry = parsed_data.entries[i]
             time = news_entry.published[:22]
             used_news_headlines.append(news_entry.title)
